@@ -1,24 +1,28 @@
 from flask import Flask, request, jsonify, render_template
 import psycopg2
 import os
+from google.cloud.sql.connector import Connector
 
 # Configurar Flask para que busque los templates en la misma carpeta que app.py
-app = Flask(__name__, template_folder=".")
+app = Flask(__name__)
 
-# ---- Configuración de la BD ----
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
+DB_NAME = os.getenv("DB_NAME")
+INSTANCE_CONNECTION_NAME = os.getenv("DB_HOST")  # ej: verdant-catcher-472420-m1:us-central1:startup-bd
+
+# Inicializa el conector
+connector = Connector()
 
 def get_connection():
-    return psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
+    conn = connector.connect(
+        INSTANCE_CONNECTION_NAME,
+        "pg8000",
         user=DB_USER,
-        password=DB_PASS
+        password=DB_PASS,
+        db=DB_NAME
     )
-
+    return conn
 # ---- Rutas API ----
 
 @app.route("/students", methods=["POST"])
@@ -148,3 +152,4 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
+
