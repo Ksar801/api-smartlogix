@@ -17,7 +17,7 @@ connector = Connector()
 def get_connection():
     conn = connector.connect(
         INSTANCE_CONNECTION_NAME,
-        "pg8080",
+        "pg8000",
         user=DB_USER,
         password=DB_PASS,
         db=DB_NAME
@@ -152,6 +152,7 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
+
 
 
 
