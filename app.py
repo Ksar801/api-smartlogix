@@ -1,3 +1,4 @@
+import traceback 
 from flask import Flask, request, jsonify, render_template
 import psycopg2
 import os
@@ -116,34 +117,50 @@ def registrar():
     titulo = request.form["titulo"]
     descripcion = request.form["descripcion"]
 
-    conn = get_connection()
-    cur = conn.cursor()
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
 
-    # Insertar estudiante
-    cur.execute(
-        "INSERT INTO students (nombre, correo) VALUES (%s, %s) RETURNING id;",
-        (nombre, correo)
-    )
-    student_id = cur.fetchone()[0]
+        # Insertar estudiante
+        cur.execute(
+            "INSERT INTO students (nombre, correo) VALUES (%s, %s) RETURNING id;",
+            (nombre, correo)
+        )
+        student_id = cur.fetchone()[0]
 
-    # Insertar curso
-    cur.execute(
-        "INSERT INTO courses (titulo, descripcion) VALUES (%s, %s) RETURNING id;",
-        (titulo, descripcion)
-    )
-    course_id = cur.fetchone()[0]
+        # Insertar curso
+        cur.execute(
+            "INSERT INTO courses (titulo, descripcion) VALUES (%s, %s) RETURNING id;",
+            (titulo, descripcion)
+        )
+        course_id = cur.fetchone()[0]
 
-    # Insertar matrícula
-    cur.execute(
-        "INSERT INTO enrollments (student_id, course_id, puntaje, estado) VALUES (%s, %s, 100, 'Activo');",
-        (student_id, course_id)
-    )
+        # Insertar matrícula
+        cur.execute(
+            "INSERT INTO enrollments (student_id, course_id, puntaje, estado) VALUES (%s, %s, 100, 'Activo');",
+            (student_id, course_id)
+        )
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        conn.commit()
 
-    return f"Estudiante y curso registrados correctamente. Estudiante ID: {student_id}, Curso ID: {course_id}"
+        return f"✅ Estudiante y curso registrados correctamente. Estudiante ID: {student_id}, Curso ID: {course_id}"
+
+    except Exception as e:
+        # Captura tipo de error y traceback completo
+        error_type = type(e).__name__
+        error_trace = traceback.format_exc()
+        return f"❌ Error en el registro\nTipo: {error_type}\nDetalle:\n{error_trace}"
+
+    finally:
+        # Cierra cursor y conexión si existen
+        try:
+            cur.close()
+        except:
+            pass
+        try:
+            conn.close()
+        except:
+            pass
 
 # ---- Ruta home ----
 @app.route("/")
@@ -152,4 +169,5 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
+
 
