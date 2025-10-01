@@ -109,40 +109,37 @@ def get_student_enrollments(student_id):
 def form():
     return render_template("llenar_datos.html")  # buscará el HTML en la misma carpeta
 
-@app.route("/registrar", methods=["POST"])
-def registrar():
-    nombre = request.form["nombre"]
-    correo = request.form["correo"]
-    titulo = request.form["titulo"]
-    descripcion = request.form["descripcion"]
-
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-
-        # Insertar estudiante
-        cur.execute(
-            "INSERT INTO students (nombre, correo) VALUES (%s, %s) RETURNING id;",
-            (nombre, correo)
-        )
-        student_id = cur.fetchone()[0]
-
-        # Insertar curso
-        cur.execute(
-            "INSERT INTO courses (titulo, descripcion) VALUES (%s, %s) RETURNING id;",
-            (titulo, descripcion)
-        )
-        course_id = cur.fetchone()[0]
-
-        # Insertar matrícula
-        cur.execute(
-            "INSERT INTO enrollments (student_id, course_id, puntaje, estado) VALUES (%s, %s, 100, 'Activo');",
-            (student_id, course_id)
-        )
-
-        conn.commit()
-
-        return f"✅ Estudiante y curso registrados correctamente. Estudiante ID: {student_id}, Curso ID: {course_id}"
+@app.route("/registrar", methods=["POST"]) 
+def registrar(): 
+    nombre = request.form["nombre"] 
+    correo = request.form["correo"] 
+    titulo = request.form["titulo"] 
+    descripcion = request.form["descripcion"] 
+    
+    conn = get_connection() 
+    cur = conn.cursor() 
+    
+    # Insertar estudiante 
+    cur.execute( 
+        "INSERT INTO students (nombre, correo) VALUES (%s, %s) RETURNING id;", (nombre, correo) 
+    ) 
+    student_id = cur.fetchone()[0] 
+    
+    # Insertar curso 
+    cur.execute( 
+        "INSERT INTO courses (titulo, descripcion) VALUES (%s, %s) RETURNING id;", (titulo, descripcion) 
+    ) course_id = cur.fetchone()[0] 
+    
+    # Insertar matrícula 
+    cur.execute( 
+        "INSERT INTO enrollments (student_id, course_id, puntaje, estado) VALUES (%s, %s, 100, 'Activo');", 
+        (student_id, course_id) 
+    ) 
+    conn.commit() 
+    cur.close() 
+    conn.close() 
+    
+    return f"Estudiante y curso registrados correctamente. Estudiante ID: {student_id}, Curso ID: {course_id}"
 
     except Exception as e:
         print("ERROR:", e)
@@ -155,6 +152,7 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
+
 
 
 
