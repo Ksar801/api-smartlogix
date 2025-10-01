@@ -17,7 +17,7 @@ connector = Connector()
 def get_connection():
     conn = connector.connect(
         INSTANCE_CONNECTION_NAME,
-        "pg8000",
+        "pg8081",
         user=DB_USER,
         password=DB_PASS,
         db=DB_NAME
@@ -151,7 +151,8 @@ def home():
     return jsonify({"mensaje": "La API de SmartLogix está funcionando ✅"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8081, debug=True)
+
 
 
 
