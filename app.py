@@ -1,4 +1,3 @@
-import traceback 
 from flask import Flask, request, jsonify, render_template
 import psycopg2
 import os
@@ -146,21 +145,8 @@ def registrar():
         return f"✅ Estudiante y curso registrados correctamente. Estudiante ID: {student_id}, Curso ID: {course_id}"
 
     except Exception as e:
-        # Captura tipo de error y traceback completo
-        error_type = type(e).__name__
-        error_trace = traceback.format_exc()
-        return f"❌ Error en el registro\nTipo: {error_type}\nDetalle:\n{error_trace}"
-
-    finally:
-        # Cierra cursor y conexión si existen
-        try:
-            cur.close()
-        except:
-            pass
-        try:
-            conn.close()
-        except:
-            pass
+        print("ERROR:", e)
+        return f"❌ Error en el registro: {e}"
 
 # ---- Ruta home ----
 @app.route("/")
@@ -169,5 +155,6 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
+
 
 
